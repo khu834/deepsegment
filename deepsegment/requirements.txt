@@ -1,0 +1,14 @@
+tensorflow-gpu == 1.14.0
+numpy == 1.15.4
+
+# Requirements for data preparation and evaluation
+pydub == 0.23.1
+google-cloud-storage==1.6.0
+google-cloud==0.32.0
+tqdm==4.29.0
+pandas==0.25.2
+matplotlib==3.1.1
+num2words==0.5.10
+mypy-extensions==0.4.3
+spacy==2.2.2
+gcsfs==0.3.1
