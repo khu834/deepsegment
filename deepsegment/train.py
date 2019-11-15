@@ -79,8 +79,8 @@ def generate_data(lines, max_sents_per_example=6, n_examples=1000):
     
     return x, y
 
-def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path):
-    embeddings = load_glove(glove_path)
+def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None):
+    embeddings = load_glove(glove_path) if glove_path else None
     
     checkpoint_path = os.path.join(save_folder, 'checkpoint')
     final_weights_path = os.path.join(save_folder, 'final_weights')
