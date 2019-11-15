@@ -1,6 +1,7 @@
 from keras.models import model_from_json
 import numpy as np
 from seqtag_keras.layers import CRF
+from seqtag_keras.models import load_model
 import pydload
 import pickle
 import os
@@ -47,6 +48,7 @@ lang_code_mapping = {
     'italian': 'it'
 }
 
+
 def chunk(l, n):
     """Yield successive n-sized chunks from l."""
     chunked_l = []
@@ -58,10 +60,12 @@ def chunk(l, n):
 
     return chunked_l
 
+
 def predict_response_to_array(response, output_tensor_name):
     dims = response.outputs[output_tensor_name].tensor_shape.dim
     shape = tuple(d.size for d in dims)
     return np.reshape(response.outputs[output_tensor_name].float_val, shape)
+
 
 def get_tf_serving_respone(seqtag_model, x):
     channel = grpc.insecure_channel("localhost:8500")
@@ -76,14 +80,16 @@ def get_tf_serving_respone(seqtag_model, x):
     preds = [np.argmax(_tags, axis=1).tolist() for _tags in preds]
     return preds
 
-class DeepSegment():
+
+class DeepSegment(object):
     seqtag_model = None
     data_converter = None
+
     def __init__(self, lang_code='en', checkpoint_path=None, params_path=None, utils_path=None, tf_serving=False, checkpoint_name=None):
         if lang_code:
             if lang_code not in model_links and lang_code in lang_code_mapping:
                 lang_code = lang_code_mapping[lang_code]
-                
+
             if lang_code not in model_links:
                 print("DeepSegment doesn't support '" + lang_code + "' yet.")
                 print("Please raise a issue at https://github.com/bedapudi6788/deepsegment to add this language into future checklist.")
@@ -119,7 +125,7 @@ class DeepSegment():
 
             utils_path = os.path.join(lang_path, 'utils')
             params_path = os.path.join(lang_path, 'params')
-            
+
             if not os.path.exists(lang_path):
                 os.mkdir(lang_path)
 
@@ -138,7 +144,7 @@ class DeepSegment():
         if not tf_serving:
             DeepSegment.seqtag_model = model_from_json(open(params_path).read(), custom_objects={'CRF': CRF})
             DeepSegment.seqtag_model.load_weights(checkpoint_path)
-        
+
         elif tf_serving:
             if not is_tfserving_installed:
                 logging.exception("Tensorflow serving is not installed. Cannot be used with tesnorflow serving docker images.")
@@ -218,3 +224,10 @@ class DeepSegment():
             segmented.append(' '.join(prefix))
 
         return segmented
+
+
+class DeepSegmentDictation(DeepSegment):
+    def __init__(self, params_path, weights_path, utils_path, *args, **kwargs):
+        DeepSegment.seqtag_model = model_from_json(open(params_path).read(), custom_objects={'CRF': CRF})
+        DeepSegment.seqtag_model.load_weights(weights_path)
+        DeepSegment.data_converter = pickle.load(open(utils_path, 'rb'))

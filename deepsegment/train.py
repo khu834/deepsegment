@@ -1,16 +1,7 @@
 import random
 random.seed(42)
 
-import logging
-
 import tensorflow as tf
-
-try:
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-except:
-    pass
 
 import seqtag_keras
 
@@ -29,6 +20,14 @@ import pickle
 import datetime
 
 from seqeval.metrics import f1_score
+
+try:
+    config = tf.ConfigProto()
+    config.gpu_options.allow_growth = True
+    session = tf.Session(config=config)
+except:
+    pass
+
 
 def bad_sentence_generator(sent, remove_punctuation = None):
     if not remove_punctuation:
@@ -55,6 +54,7 @@ def bad_sentence_generator(sent, remove_punctuation = None):
     
     return sent
 
+
 def generate_data(lines, max_sents_per_example=6, n_examples=1000):
     x, y = [], []
     
@@ -79,6 +79,7 @@ def generate_data(lines, max_sents_per_example=6, n_examples=1000):
     
     return x, y
 
+
 def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None):
     embeddings = load_glove(glove_path) if glove_path else None
     
@@ -102,6 +103,7 @@ lang_code_mapping = {
     'french': 'fr',
     'italian': 'it'
 }
+
 
 def finetune(lang_code, x, y, vx, vy, name=None, epochs=5, batch_size=16, lr=0.0001):
     if not name:
