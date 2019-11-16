@@ -167,8 +167,8 @@ class DeepSegment(object):
         sents = [sent.strip().split() for sent in sents]
 
         max_len = len(max(sents, key=len))
-        if max_len >= 40:
-            # logging.warn("Consider using segment_long for longer sentences.")
+        # if max_len >= 40:
+        # logging.warn("Consider using segment_long for longer sentences.")
 
         encoded_sents = DeepSegment.data_converter.transform(sents)
         
