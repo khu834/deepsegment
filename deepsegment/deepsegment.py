@@ -160,7 +160,7 @@ class DeepSegment(object):
 
         string_output = False
         if not isinstance(sents, list):
-            logging.warn("Batch input strings for faster inference.")
+            # logging.warn("Batch input strings for faster inference.")
             string_output = True
             sents = [sents]
 
@@ -168,7 +168,7 @@ class DeepSegment(object):
 
         max_len = len(max(sents, key=len))
         if max_len >= 40:
-            logging.warn("Consider using segment_long for longer sentences.")
+            # logging.warn("Consider using segment_long for longer sentences.")
 
         encoded_sents = DeepSegment.data_converter.transform(sents)
         
