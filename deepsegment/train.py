@@ -80,7 +80,7 @@ def generate_data(lines, max_sents_per_example=6, n_examples=1000, remove_punctu
     return x, y
 
 
-def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None):
+def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None, early_stop=True):
     embeddings = load_glove(glove_path) if glove_path else None
     
     checkpoint_path = os.path.join(save_folder, 'checkpoint')
@@ -90,11 +90,12 @@ def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None):
 
     checkpoint = ModelCheckpoint(checkpoint_path, verbose=1, save_best_only=True, mode='max', monitor='f1')
     earlystop = EarlyStopping(patience=3, monitor='f1', mode='max')
+    callbacks = [checkpoint]
+    if early_stop:
+        callbacks.append(earlystop)
 
     model = seqtag_keras.Sequence(embeddings=embeddings)
-    
-    model.fit(x, y, x_valid=vx, y_valid=vy, epochs=epochs, batch_size=batch_size, callbacks=[checkpoint, earlystop])
-
+    model.fit(x, y, x_valid=vx, y_valid=vy, epochs=epochs, batch_size=batch_size, callbacks=callbacks)
     model.save(final_weights_path, params_path, utils_path)
 
 
