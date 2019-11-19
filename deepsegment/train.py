@@ -55,18 +55,18 @@ def bad_sentence_generator(sent, remove_punctuation = None):
     return sent
 
 
-def generate_data(lines, max_sents_per_example=6, n_examples=1000):
+def generate_data(lines, max_sents_per_example=6, n_examples=1000, remove_punctuation=False):
     x, y = [], []
     
-    for current_i in progressbar(range(n_examples)):
+    for _ in progressbar(range(n_examples)):
         x.append([])
         y.append([])
 
         chosen_lines = []
         for _ in range(random.randint(1, max_sents_per_example)):
             chosen_lines.append(random.choice(lines))
-        
-        chosen_lines = [bad_sentence_generator(line, remove_punctuation=random.randint(0, 3)) for line in chosen_lines]
+        if remove_punctuation:
+            chosen_lines = [bad_sentence_generator(line, remove_punctuation=random.randint(0, 3)) for line in chosen_lines]
         
         for line in chosen_lines:
             words = line.strip().split()
