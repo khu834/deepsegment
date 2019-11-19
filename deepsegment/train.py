@@ -56,7 +56,7 @@ def bad_sentence_generator(sent, remove_punctuation = None):
 
 
 def generate_data(lines, max_sents_per_example=6, n_examples=1000, remove_punctuation=False):
-    x, y = [], []
+    x, y, sentences = [], [], []
     
     for _ in progressbar(range(n_examples)):
         x.append([])
@@ -67,7 +67,8 @@ def generate_data(lines, max_sents_per_example=6, n_examples=1000, remove_punctu
             chosen_lines.append(random.choice(lines))
         if remove_punctuation:
             chosen_lines = [bad_sentence_generator(line, remove_punctuation=random.randint(0, 3)) for line in chosen_lines]
-        
+
+        sentences.append(chosen_lines)
         for line in chosen_lines:
             words = line.strip().split()
             for word_i, word in enumerate(words):
@@ -77,7 +78,7 @@ def generate_data(lines, max_sents_per_example=6, n_examples=1000, remove_punctu
                     label = 'B-sent'
                 y[-1].append(label)
     
-    return x, y
+    return x, y, sentences
 
 
 def train(x, y, vx, vy, epochs, batch_size, save_folder, glove_path=None, early_stop=True):
